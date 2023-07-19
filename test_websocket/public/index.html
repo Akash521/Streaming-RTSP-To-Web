@@ -1,0 +1,105 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>RTSP Stream</title>
+  <style>
+    #video-player {
+      width: 640px;
+      height: 480px;
+    }
+  </style>
+</head>
+<body>
+  <div id="video-container">
+    <video id="video-player" autoplay></video>
+  </div>
+
+  <script>
+    const videoElement = document.getElementById('video-player');
+    const webSocket = new WebSocket('ws://localhost:8082/');
+
+    webSocket.onmessage = function(event) {
+      console.log(event)
+      const videoData = new Uint8Array(event.data);
+      const videoBlob = new Blob([videoData], { type: 'video/mp4' });
+      const videoUrl = URL.createObjectURL(videoBlob);
+
+      videoElement.src = videoUrl;
+    };
+
+    webSocket.onclose = function() {
+      videoElement.src = '';
+    };
+  </script>
+</body>
+</html> -->
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Stream</title>
+</head>
+<body>
+  <video id="video-player" autoplay></video>
+
+  <script>
+    const videoElement = document.getElementById('video-player');
+    const webSocket = new WebSocket('ws://localhost:8082/');
+
+    // Store the received video data chunks
+    const videoChunks = [];
+
+    webSocket.onmessage = function(event) {
+      // Push the received data to the chunks array
+      videoChunks.push(event.data);
+    };
+
+    webSocket.onclose = function() {
+      // Combine the video chunks into a single Blob
+      const videoBlob = new Blob(videoChunks, { type: 'video/mp4' });
+
+      // Create a URL object from the Blob
+      const videoUrl = URL.createObjectURL(videoBlob);
+
+      // Set the video source to the Blob URL
+      videoElement.src = videoUrl;
+    };
+  </script>
+</body>
+</html> -->
+<html>
+<head>
+  <title>WebSocket Stream</title>
+</head>
+<body>
+<video id="video-player" autoplay></video>
+
+<script>
+  const videoElement = document.getElementById('video-player');
+  const mediaSource = new MediaSource();
+  videoElement.src = URL.createObjectURL(mediaSource);
+</script>
+
+<script>
+  mediaSource.addEventListener('sourceopen', handleSourceOpen);
+  
+  function handleSourceOpen() {
+    const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
+    const webSocket = new WebSocket('ws://localhost:8082/');
+
+    webSocket.onmessage = function(event) {
+      // Append the received video data to the source buffer
+      sourceBuffer.appendBuffer(event.data);
+    };
+
+    webSocket.onclose = function() {
+      // Signal the end of the media stream
+      mediaSource.endOfStream();
+    };
+  }
+</script>
+
+</body>
+</html> 
+
+
