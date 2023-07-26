@@ -12,11 +12,41 @@
 </head>
 <body>
 	<canvas id="video-canvas"></canvas>
+	<!--  -->
 	<script type="text/javascript" src="jsmpeg.min.js"></script>
 	<script type="text/javascript">
 		var canvas = document.getElementById('video-canvas');
-		var url = 'ws://'+document.location.hostname+':8082/';
+		var url = 'ws://localhost:8082/';
 		var player = new JSMpeg.Player(url, {canvas: canvas});
 	</script>
+
+
+
+<video id="video-player" autoplay></video>
+
+<script>
+  const videoPlayer = document.getElementById('video-player');
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${wsProtocol}//${window.location.host}`;
+  console.log(wsUrl)
+
+  const ws = new WebSocket(url);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onmessage = (event) => {
+	const videoData = new Uint8Array(event.data);
+	const videoBlob = new Blob([videoData], { type: 'video/mp4' });
+	const videoUrl = URL.createObjectURL(videoBlob);
+
+	videoPlayer.src = videoUrl;
+  };
+
+  ws.onclose = () => {
+	videoPlayer.src = '';
+  };
+</script>
+
 </body>
+
+
 </html>
