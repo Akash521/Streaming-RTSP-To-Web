@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RTSP Stream with MJPEG in Browser</title>
+</head>
+<body>
+    <canvas id="videoCanvas" width="640" height="480"></canvas>
+    <script type="text/javascript" src="jsmpeg.min.js"></script>
+    <script>
+        // Replace "YOUR_RTSP_STREAM_URL" with the actual RTSP stream URL
+        const videoUrl = "rtsp://admin:admin@123@192.168.10.101:554/Streaming/Channels/401";
+
+        // Create a canvas element to display the video
+        const canvas = document.getElementById("videoCanvas");
+
+        // Create a new JSMpeg.Player instance
+        const player = new JSMpeg.Player(videoUrl, {
+            canvas: canvas,
+            autoplay: true,
+            loop: true,
+            disableWebAssembly: true, // Disable WebAssembly for broader browser support
+        });
+    </script>
+</body>
+</html>

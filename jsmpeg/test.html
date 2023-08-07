@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Stream with jsmpeg</title>
+</head>
+<body>
+    <h1>WebSocket Stream with jsmpeg</h1>
+    <canvas id="videoCanvas" width="640" height="480"></canvas>
+
+    <script type="text/javascript" src="jsmpeg.min.js"></script>
+    <script>
+        // Replace 'ws://your-websocket-server-address' with the actual WebSocket server address.
+        const websocketUrl = 'ws://127.0.0.1:8082';
+
+        // Get the canvas and create a jsmpeg instance.
+        const canvas = document.getElementById('videoCanvas');
+        const player = new JSMpeg.Player(websocketUrl, { canvas });
+
+        // If you want to handle the image blobs manually:
+        const socket = new WebSocket(websocketUrl);
+        socket.binaryType = 'arraybuffer';
+        socket.onmessage = (event) => {
+            const blob = new Blob([event.data], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+                // Draw the image on the canvas.
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RTSP Stream in Browser</title>
+</head>
+<body>
+  <video id="videoElement" autoplay></video>
+
+  <script>
+    const videoElement = document.getElementById('videoElement');
+    const wsUrl = 'ws://localhost:9900/'; // Change to your server address if different
+    const mediaSource = new MediaSource();
+
+    // Event handler for when the MediaSource is open
+    mediaSource.addEventListener('sourceopen', handleSourceOpen);
+
+    // Event handler for when the MediaSource encounters an error
+    mediaSource.addEventListener('error', handleMediaSourceError);
+
+    // Append the MediaSource to the video element
+    videoElement.src = URL.createObjectURL(mediaSource);
+
+    function handleSourceOpen() {
+      const mediaSourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+
+      const ws = new WebSocket(wsUrl);
+
+      ws.onopen = function () {
+        console.log('WebSocket connection established.');
+      };
+
+      ws.onmessage = function (event) {
+        
+        if (event.data instanceof Blob && mediaSource.readyState === 'open') {
+            console.log(event.data)
+            const reader = new FileReader();
+            reader.onload = function () {
+            const buffer = reader.result;
+
+            mediaSourceBuffer.addEventListener('updateend', function () {
+                // Wait for the updateend event before appending more data
+                if (!mediaSourceBuffer.updating) {
+                mediaSourceBuffer.appendBuffer(buffer);
+                }
+            });
+
+            // If the SourceBuffer is not updating, append the buffer immediately
+            if (!mediaSourceBuffer.updating) {
+                mediaSourceBuffer.appendBuffer(buffer);
+            }
+            };
+            reader.readAsArrayBuffer(event.data);
+        }
+        };
+
+
+      ws.onclose = function (event) {
+        console.log('WebSocket connection closed:', event.code, event.reason);
+      };
+
+      ws.onerror = function (event) {
+        console.error('WebSocket error:', event);
+      };
+    }
+
+    function handleMediaSourceError(event) {
+      console.error('MediaSource error:', event);
+    }
+  </script>
+</body>
+</html>
