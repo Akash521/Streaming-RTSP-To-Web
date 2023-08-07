@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>rtsp</title>
+
+        <div><canvas id="video" width="640" height="360"></canvas></div>
+        <script type="text/javascript" src="jsmpeg.js"></script>
+        <script type="text/javascript">
+            var canvas = document.getElementById('video');
+            var ws = new WebSocket("ws://127.0.0.1:9900");
+                var player = new jsmpeg(ws, {canvas:canvas, autoplay:true, audio:false, loop:true});
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
