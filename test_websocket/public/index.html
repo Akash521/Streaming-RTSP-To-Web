@@ -85,7 +85,7 @@
   
   function handleSourceOpen() {
     const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E"');
-    const webSocket = new WebSocket('ws://localhost:8082/');
+    const webSocket = new WebSocket('ws://10.13.10.6:30424');
 
     webSocket.onmessage = function(event) {
       // Append the received video data to the source buffer
